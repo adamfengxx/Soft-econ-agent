@@ -1,0 +1,52 @@
+services:
+
+  # ── PostgreSQL 数据库 ───────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: econagent-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: econagent
+    ports:
+      - "5432:5432"      # 暴露给本地调试用，生产可去掉
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── FastAPI 后端 ────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .                  # 构建上下文是项目根目录
+      dockerfile: backend/Dockerfile
+    container_name: econagent-backend
+    restart: unless-stopped
+    env_file: .env                # 从根目录的 .env 读取所有 API Key
+    environment:
+      # 覆盖 .env 里的 DATABASE_URL，把 localhost 换成 docker 服务名
+      DATABASE_URL: postgresql+psycopg://postgres:password@postgres:5432/econagent
+    ports:
+      - "8000:8000"               # 暴露给本地调试用，生产可去掉
+    depends_on:
+      postgres:
+        condition: service_healthy  # 等 postgres 健康检查通过再启动
+
+  # ── React 前端（nginx）──────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: econagent-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"                   # 访问 http://localhost
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

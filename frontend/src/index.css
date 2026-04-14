@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #fafafa;
+  color: #111;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #e5e5e5;
+  border-radius: 99px;
+}
+
+/* Markdown prose in messages */
+.prose-message p { margin-bottom: 0.5em; }
+.prose-message p:last-child { margin-bottom: 0; }
+.prose-message ul, .prose-message ol { padding-left: 1.25em; margin-bottom: 0.5em; }
+.prose-message li { margin-bottom: 0.25em; }
+.prose-message strong { font-weight: 600; }
+.prose-message em { font-style: italic; }
+.prose-message code {
+  background: rgba(0,0,0,0.06);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 0.88em;
+  font-family: 'Menlo', 'Monaco', monospace;
+}
